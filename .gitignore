@@ -3,3 +3,4 @@
 !.gitattributes
 !.gitignore
 !.editorconfig
+/terraform.tfvars
