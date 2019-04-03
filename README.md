@@ -9,5 +9,4 @@ Based on https://github.com/Azure/azure-quickstart-templates/tree/master/301-dns
 - Add support for existing virtual network / subnet?
 - Support (default) configuration without public IPs
 - Convert into module
-- Support private-only zones?
 - Improve README

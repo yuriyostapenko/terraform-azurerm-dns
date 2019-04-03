@@ -1,4 +1,5 @@
 resource "azurerm_resource_group" "public" {
+  count = "${length(var.public_zones) > 0 ? 1 : 0}"
   name     = "${var.prefix}-public"
   location = "${var.location}"
   tags = "${var.tags}"
@@ -66,16 +67,16 @@ resource "azurerm_subnet_network_security_group_association" "resolver" {
 }
 
 resource "azurerm_dns_zone" "public" {
-  count               = "${length(var.zones)}"
-  name                = "${var.zones[count.index]}"
+  count               = "${length(var.public_zones)}"
+  name                = "${var.public_zones[count.index]}"
   resource_group_name = "${azurerm_resource_group.public.name}"
   zone_type           = "Public"
   tags = "${var.tags}"
 }
 
 resource "azurerm_dns_zone" "private" {
-  count                           = "${length(var.zones)}"
-  name                            = "${var.zones[count.index]}"
+  count                           = "${length(var.private_zones)}"
+  name                            = "${var.private_zones[count.index]}"
   resource_group_name             = "${azurerm_resource_group.private.name}"
   zone_type                       = "Private"
   resolution_virtual_network_ids  = [

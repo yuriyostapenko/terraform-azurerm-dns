@@ -10,9 +10,14 @@ variable "tags" {
   default     = {}
 }
 
-variable "zones" {
+variable "public_zones" {
   type        = "list"
-  description = "DNS zone names"
+  description = "Public DNS Zone names (domain names)"
+}
+
+variable "private_zones" {
+  type        = "list"
+  description = "Private DNS Zone names (domain names)"
 }
 
 variable "location" {
