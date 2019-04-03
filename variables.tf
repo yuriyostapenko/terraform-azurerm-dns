@@ -1,3 +1,15 @@
+variable "prefix" {
+  type        = "string"
+  description = "Prefix to add to all managed resource names. Example: 'test-'."
+  default     = "dns"
+}
+
+variable "tags" {
+  type        = "map"
+  description = "Tags to add to all managed resources."
+  default     = {}
+}
+
 variable "zones" {
   type        = "list"
   description = "DNS zone names"

@@ -1,32 +1,36 @@
 resource "azurerm_resource_group" "public" {
-  name     = "dns-zones-public"
+  name     = "${var.prefix}-public"
   location = "${var.location}"
+  tags = "${var.tags}"
 }
 
 resource "azurerm_resource_group" "private" {
-  name     = "dns-zones-private"
+  name     = "${var.prefix}-private"
   location = "${var.location}"
+  tags = "${var.tags}"
 }
 
 resource "azurerm_virtual_network" "resolver" {
-  name                = "private-resolver-network"
+  name                = "${var.prefix}-resolver-network"
   resource_group_name = "${azurerm_resource_group.private.name}"
   location            = "${azurerm_resource_group.private.location}"
   address_space       = ["${var.resolver_vnet_prefix}"]
+  tags = "${var.tags}"
 }
 
 resource "azurerm_network_security_group" "resolver" {
-  name                = "private-resolver-nsg"
+  name                = "${var.prefix}-resolver-nsg"
   location            = "${azurerm_resource_group.private.location}"
   resource_group_name = "${azurerm_resource_group.private.name}"
+  tags = "${var.tags}"
 }
 
 resource "azurerm_subnet" "resolver" {
-  name                      = "private-resolver-subnet"
+  name                      = "${var.prefix}-resolver-subnet"
   resource_group_name       = "${azurerm_resource_group.private.name}"
   virtual_network_name      = "${azurerm_virtual_network.resolver.name}"
   address_prefix            = "${var.resolver_subnet_prefix}"
-  network_security_group_id = "${azurerm_network_security_group.resolver.id}"
+  # network_security_group_id = "${azurerm_network_security_group.resolver.id}"
 }
 
 resource "azurerm_subnet_network_security_group_association" "resolver" {
@@ -39,6 +43,7 @@ resource "azurerm_dns_zone" "public" {
   name                = "${var.zones[count.index]}"
   resource_group_name = "${azurerm_resource_group.public.name}"
   zone_type           = "Public"
+  tags = "${var.tags}"
 }
 
 resource "azurerm_dns_zone" "private" {
@@ -49,37 +54,39 @@ resource "azurerm_dns_zone" "private" {
   resolution_virtual_network_ids  = [
     "${azurerm_virtual_network.resolver.id}"
   ]
+  tags = "${var.tags}"
 }
 
 resource "azurerm_public_ip" "resolver" {
   count               = "${var.resolver_count}"
-  name                = "resolver-${format("%02d", count.index + 1)}-public-ip"
+  name                = "${var.prefix}-resolver-${format("%02d", count.index + 1)}-public-ip"
   location            = "${azurerm_resource_group.private.location}"
   resource_group_name = "${azurerm_resource_group.private.name}"
   allocation_method   = "Static"
   zones = "${list(element(var.availability_zones, count.index))}"
+  tags = "${var.tags}"
 }
 
 resource "azurerm_network_interface" "resolver" {
   count               = "${var.resolver_count}"
-  name                = "resolver-${format("%02d", count.index + 1)}-nic"
+  name                = "${var.prefix}-resolver-${format("%02d", count.index + 1)}-nic"
   location            = "${azurerm_resource_group.private.location}"
   resource_group_name = "${azurerm_resource_group.private.name}"
 
   ip_configuration {
-    name                          = "private-ip"
+    name                          = "${var.prefix}-resolver-${format("%02d", count.index + 1)}-private-ip"
     subnet_id                     = "${azurerm_subnet.resolver.id}"
     private_ip_address_allocation = "Static"
     private_ip_address            = "${cidrhost(var.resolver_subnet_prefix, count.index + var.resolver_ip_offset)}"
     public_ip_address_id          = "${element(azurerm_public_ip.resolver.*.id, count.index)}"
   }
 
-  depends_on = ["azurerm_dns_zone.private"]
+  tags = "${var.tags}"
 }
 
 resource "azurerm_virtual_machine" "resolver" {
   count = "${var.resolver_count}"
-  name                  = "resolver-${format("%02d", count.index + 1)}"
+  name                  = "${var.prefix}-resolver-${format("%02d", count.index + 1)}"
   location              = "${azurerm_resource_group.private.location}"
   resource_group_name   = "${azurerm_resource_group.private.name}"
   network_interface_ids = ["${element(azurerm_network_interface.resolver.*.id, count.index)}"]
@@ -96,14 +103,14 @@ resource "azurerm_virtual_machine" "resolver" {
   }
 
   storage_os_disk {
-    name              = "resolver-${format("%02d", count.index + 1)}-os-disk"
+    name              = "${var.prefix}-resolver-${format("%02d", count.index + 1)}-os-disk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
   }
 
   os_profile {
-    computer_name  = "resolver-${format("%02d", count.index + 1)}"
+    computer_name  = "${var.prefix}-resolver-${format("%02d", count.index + 1)}"
     admin_username = "${var.resolver_vm_admin_username}"
   }
 
@@ -116,11 +123,13 @@ resource "azurerm_virtual_machine" "resolver" {
   }
 
   zones = "${list(element(var.availability_zones, count.index))}"
+
+  tags = "${var.tags}"
 }
 
 resource "azurerm_virtual_machine_extension" "resolver" {
   count = "${var.resolver_count}"
-  name                 = "bind"
+  name                 = "${var.prefix}-resolver-${format("%02d", count.index + 1)}-bind-setup"
   location             = "${azurerm_resource_group.private.location}"
   resource_group_name  = "${azurerm_resource_group.private.name}"
   virtual_machine_name = "${element(azurerm_virtual_machine.resolver.*.name, count.index)}"
@@ -134,4 +143,5 @@ resource "azurerm_virtual_machine_extension" "resolver" {
     }
 SETTINGS
 
+  tags = "${var.tags}"
 }
