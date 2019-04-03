@@ -67,6 +67,16 @@ variable "resolver_vm_admin_ssh_pub_key_file" {
   description = "Resolver VM admin ssh public key path"
 }
 
+variable "resolver_vm_ssh_client_whitelist" {
+  type        = "list"
+  description = "List of CIDR entries of acceptable resolver VM ssh clients"
+  default = [
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+    "192.168.0.0/16"
+  ]
+}
+
 variable "resolver_client_whitelist" {
   type        = "list"
   description = "List of CIDR entries of acceptable DNS resolver client IPs"

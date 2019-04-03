@@ -25,12 +25,39 @@ resource "azurerm_network_security_group" "resolver" {
   tags = "${var.tags}"
 }
 
+resource "azurerm_network_security_rule" "ssh" {
+  name                        = "SSH"
+  priority                    = 122
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "22"
+  source_address_prefixes       = "${var.resolver_vm_ssh_client_whitelist}"
+  destination_address_prefix  = "${var.resolver_subnet_prefix}"
+  resource_group_name         = "${azurerm_resource_group.private.name}"
+  network_security_group_name = "${azurerm_network_security_group.resolver.name}"
+}
+
+resource "azurerm_network_security_rule" "dns" {
+  name                        = "DNS"
+  priority                    = 153
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Udp"
+  source_port_range           = "*"
+  destination_port_range      = "53"
+  source_address_prefixes       = "${var.resolver_client_whitelist}"
+  destination_address_prefix  = "${var.resolver_subnet_prefix}"
+  resource_group_name         = "${azurerm_resource_group.private.name}"
+  network_security_group_name = "${azurerm_network_security_group.resolver.name}"
+}
+
 resource "azurerm_subnet" "resolver" {
   name                      = "${var.prefix}-resolver-subnet"
   resource_group_name       = "${azurerm_resource_group.private.name}"
   virtual_network_name      = "${azurerm_virtual_network.resolver.name}"
   address_prefix            = "${var.resolver_subnet_prefix}"
-  # network_security_group_id = "${azurerm_network_security_group.resolver.id}"
 }
 
 resource "azurerm_subnet_network_security_group_association" "resolver" {
