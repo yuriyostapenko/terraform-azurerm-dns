@@ -89,7 +89,7 @@ resource "azurerm_dns_zone" "private" {
 }
 
 resource "azurerm_public_ip" "resolver" {
-  count               = "${var.resolver_count}"
+  count               = "${var.debug_enable_resolver_public_ips ? var.resolver_count : 0}"
   name                = "${var.prefix}-resolver-${format("%02d", count.index + 1)}-public-ip"
   location            = "${azurerm_resource_group.private.location}"
   resource_group_name = "${azurerm_resource_group.private.name}"
@@ -109,7 +109,7 @@ resource "azurerm_network_interface" "resolver" {
     subnet_id                     = "${azurerm_subnet.resolver.id}"
     private_ip_address_allocation = "Static"
     private_ip_address            = "${cidrhost(var.resolver_subnet_prefix, count.index + var.resolver_ip_offset)}"
-    public_ip_address_id          = "${element(azurerm_public_ip.resolver.*.id, count.index)}"
+    public_ip_address_id          = "${var.debug_enable_resolver_public_ips ? element(coalescelist(azurerm_public_ip.resolver.*.id, list("")), count.index) : ""}"
   }
 
   tags = "${var.tags}"

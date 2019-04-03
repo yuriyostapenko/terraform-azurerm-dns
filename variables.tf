@@ -32,6 +32,12 @@ variable "availability_zones" {
   default     = [1, 2, 3]
 }
 
+variable "debug_enable_resolver_public_ips" {
+  type        = "string"
+  description = "Enable public IP assignment to resolver VMs. For debugging only, requires appropriate resolver_vm_ssh_client_whitelist for SSH to work."
+  default     = false
+}
+
 variable "resolver_count" {
   type  = "string"
   description = "Number of resolver VMs"

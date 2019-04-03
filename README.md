@@ -7,6 +7,5 @@ Based on https://github.com/Azure/azure-quickstart-templates/tree/master/301-dns
 #### TODO
 
 - Add support for existing virtual network / subnet?
-- Support (default) configuration without public IPs
 - Convert into module
 - Improve README
