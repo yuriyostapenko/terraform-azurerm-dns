@@ -70,7 +70,7 @@ resource "azurerm_network_interface" "resolver" {
     name                          = "private-ip"
     subnet_id                     = "${azurerm_subnet.resolver.id}"
     private_ip_address_allocation = "Static"
-    private_ip_address            = "${cidrhost(var.resolver_subnet_prefix, count.index + 4)}"
+    private_ip_address            = "${cidrhost(var.resolver_subnet_prefix, count.index + var.resolver_ip_offset)}"
     public_ip_address_id          = "${element(azurerm_public_ip.resolver.*.id, count.index)}"
   }
 

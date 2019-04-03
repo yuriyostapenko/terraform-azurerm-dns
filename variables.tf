@@ -24,13 +24,19 @@ variable "resolver_count" {
 variable "resolver_vnet_prefix" {
   type        = "string"
   description = "Resolver virtual network address space"
-  default     = "10.53.0.0/16"
+  default     = "10.53.53.0/24"
 }
 
 variable "resolver_subnet_prefix" {
   type        = "string"
   description = "Resolver subnet address space"
   default     = "10.53.53.0/24"
+}
+
+variable "resolver_ip_offset" {
+  type        = "string"
+  description = "IP address offset within the subnet. 4 is the minimum valid value. resolver private IPs will be assigned sequentially starting with offset."
+  default     = "4"
 }
 
 variable "resolver_vm_size" {
