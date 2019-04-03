@@ -57,7 +57,7 @@ resource "azurerm_public_ip" "resolver" {
   location            = "${azurerm_resource_group.private.location}"
   resource_group_name = "${azurerm_resource_group.private.name}"
   allocation_method   = "Static"
-  zones = ["${(count.index % 3) + 1}"]
+  zones = "${list(element(var.availability_zones, count.index))}"
 }
 
 resource "azurerm_network_interface" "resolver" {
@@ -115,7 +115,7 @@ resource "azurerm_virtual_machine" "resolver" {
     }]
   }
 
-  zones = ["${(count.index % 3) + 1}"]
+  zones = "${list(element(var.availability_zones, count.index))}"
 }
 
 resource "azurerm_virtual_machine_extension" "resolver" {

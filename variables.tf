@@ -4,8 +4,15 @@ variable "zones" {
 }
 
 variable "location" {
+  type        = "string"
   default     = "West Europe"
   description = "The Azure region in which regional resources should be provisioned (VMs and resolver network)"
+}
+
+variable "availability_zones" {
+  type        = "list"
+  description = "Numbers of availability zones to use to spread resolvers into. Regious without availability zones are currently not supported."
+  default     = [1, 2, 3]
 }
 
 variable "resolver_count" {
