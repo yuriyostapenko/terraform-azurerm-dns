@@ -170,7 +170,7 @@ resource "azurerm_virtual_machine_extension" "resolver" {
 
   settings = <<SETTINGS
     {
-      "script": "${base64encode("CLIENT_WHITELIST=${join("\\;", var.resolver_client_whitelist)}\n\n${file("bind_setup.sh")}")}"
+      "script": "${base64encode("CLIENT_WHITELIST=${join("\\;", var.resolver_client_whitelist)}\n\n${file("${path.module}/bind_setup.sh")}")}"
     }
 SETTINGS
 

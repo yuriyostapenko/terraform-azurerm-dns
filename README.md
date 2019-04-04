@@ -72,5 +72,3 @@ module "dns" {
 #### TODO:
 
 - Add support for existing virtual network / subnet?
-- Convert into module
-- Improve README
