@@ -4,7 +4,7 @@ Deploy public and private Azure DNS Zones and virtual network with highly availa
 
 #### Why?
 
-Currently, zone delegation for Private DNS Zones on Azure is not supported. It's in the roadmap, but timing is unknown. This module enables zone delegation for private on-premises resolvers already now.
+Currently, zone delegation for Private DNS Zones on Azure is not supported. It's in the roadmap, but timing is unknown. This module enables _zone delegation for private on-premises resolvers_ already now, by deploying recursive resolver VMs to a private resolution network.
 
 Based on https://github.com/Azure/azure-quickstart-templates/tree/master/301-dns-forwarder, but for Terraform and with HA.
 
@@ -22,31 +22,50 @@ _Only Azure regions with Availability Zones are supported._
 
 `main.tf`
 ```hcl
+
 module "dns" {
   source  = "uncleyo/azurerm/dns"
   version = "tbd"
 
-  prefix = "dns"
+  # required variables:
 
-  tags = {
-    Environment = "test"
-  }
-
+  location = "West Europe"
   public_zones = [
     "example.org"
   ]
-
   private_zones = [
     "example.org",
     "local.only"
   ]
-
-  resolver_vm_admin_username = ""
+  resolver_vm_admin_username = "admin"
   resolver_vm_admin_ssh_pub_key_file = "~/.ssh/id_rsa.pub"
 
-  location = "West Europe"
-  resolver_count = 2
+  # optional variables with default values:
 
+  prefix = "dns"
+  tags = {}
+  debug_enable_resolver_public_ips = false
+  availability_zones = [1, 2, 3]
+  resolver_count = 2
+  resolver_vnet_prefix = "10.53.53.0/24"
+  resolver_subnet_prefix = "10.53.53.0/24"
+  resolver_ip_offset = 4
+  resolver_vm_size = Standard_B1ls
+  resolver_vm_ssh_client_whitelist = [
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+    "192.168.0.0/16"
+  ]
+  resolver_vm_ssh_client_whitelist = [
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+    "192.168.0.0/16"
+  ]
+  resolver_client_whitelist = [
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+    "192.168.0.0/16"
+  ]
 }
 ```
 

@@ -22,20 +22,19 @@ variable "private_zones" {
 
 variable "location" {
   type        = "string"
-  default     = "West Europe"
   description = "The Azure region in which regional resources should be provisioned (VMs and resolver network)"
-}
-
-variable "availability_zones" {
-  type        = "list"
-  description = "Numbers of availability zones to use to spread resolvers into. Regious without availability zones are currently not supported."
-  default     = [1, 2, 3]
 }
 
 variable "debug_enable_resolver_public_ips" {
   type        = "string"
   description = "Enable public IP assignment to resolver VMs. For debugging only, requires appropriate resolver_vm_ssh_client_whitelist for SSH to work."
   default     = false
+}
+
+variable "availability_zones" {
+  type        = "list"
+  description = "Numbers of availability zones to use to spread resolvers into. Regious without availability zones are currently not supported."
+  default     = [1, 2, 3]
 }
 
 variable "resolver_count" {
