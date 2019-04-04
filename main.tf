@@ -34,7 +34,7 @@ resource "azurerm_network_security_rule" "ssh" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "22"
-  source_address_prefixes       = "${var.resolver_vm_ssh_client_whitelist}"
+  source_address_prefixes       = "${var.resolver_ssh_client_whitelist}"
   destination_address_prefix  = "${var.resolver_subnet_prefix}"
   resource_group_name         = "${azurerm_resource_group.private.name}"
   network_security_group_name = "${azurerm_network_security_group.resolver.name}"
@@ -48,7 +48,7 @@ resource "azurerm_network_security_rule" "dns" {
   protocol                    = "Udp"
   source_port_range           = "*"
   destination_port_range      = "53"
-  source_address_prefixes       = "${var.resolver_client_whitelist}"
+  source_address_prefixes       = "${var.resolver_dns_client_whitelist}"
   destination_address_prefix  = "${var.resolver_subnet_prefix}"
   resource_group_name         = "${azurerm_resource_group.private.name}"
   network_security_group_name = "${azurerm_network_security_group.resolver.name}"
@@ -170,7 +170,7 @@ resource "azurerm_virtual_machine_extension" "resolver" {
 
   settings = <<SETTINGS
     {
-      "script": "${base64encode("CLIENT_WHITELIST=${join("\\;", var.resolver_client_whitelist)}\n\n${file("${path.module}/bind_setup.sh")}")}"
+      "script": "${base64encode("CLIENT_WHITELIST=${join("\\;", var.resolver_dns_client_whitelist)}\n\n${file("${path.module}/bind_setup.sh")}")}"
     }
 SETTINGS
 

@@ -24,8 +24,8 @@ _Only Azure regions with Availability Zones are supported._
 ```hcl
 
 module "dns" {
-  source  = "uncleyo/azurerm/dns"
-  version = "tbd"
+  source  = "uncleyo/dns/azurerm"
+  version = "0.1.0"
 
   # required variables:
 
@@ -51,17 +51,12 @@ module "dns" {
   resolver_subnet_prefix = "10.53.53.0/24"
   resolver_ip_offset = 4
   resolver_vm_size = Standard_B1ls
-  resolver_vm_ssh_client_whitelist = [
+  resolver_ssh_client_whitelist = [
     "10.0.0.0/8",
     "172.16.0.0/12",
     "192.168.0.0/16"
   ]
-  resolver_vm_ssh_client_whitelist = [
-    "10.0.0.0/8",
-    "172.16.0.0/12",
-    "192.168.0.0/16"
-  ]
-  resolver_client_whitelist = [
+  resolver_dns_client_whitelist = [
     "10.0.0.0/8",
     "172.16.0.0/12",
     "192.168.0.0/16"
